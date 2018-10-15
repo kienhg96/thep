@@ -1,0 +1,32 @@
+<nav class="navigation">
+    <div class="container">
+        <div class="row">
+            <div class="span8">
+                <a href="#" class="main-menu-button">Navigation</a>
+                <!-- Begin Menu Container -->
+                <div class="megamenu_container">
+                    <div class="menu-main-navigation-container">
+                      <ul id="menu-main-navigation" class="main-menu">
+                        <li class="menu-item-home menu-item-has-children megamenu-parent"><a href="/">Home</a></li>
+                        <li class="menu-item-has-children">
+                          <a href="/shop">Shop</a>
+            	              <ul class="sub-menu span2">
+                            {% for category in categories %}
+                              <li><a href="{{ category.url }}">{{ category.name }}</a></li>
+                            {% endfor %}
+            	              </ul>
+                          </a>
+                        </li>
+                      </ul>
+                      {% include "content/header-menu.htm" %}
+                    </div>
+                </div>
+            </div>
+            <div class="span4 visible-desktop">
+                {% if breadcrumbs %}
+                  {% include breadcrumbs %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>

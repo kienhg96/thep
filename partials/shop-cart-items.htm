@@ -1,0 +1,89 @@
+<div class="box-content">
+    <div class="cart-items">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th class="col_product text-left">Product</th>
+                    <th class="col_remove text-right">&nbsp;</th>
+                    <th class="col_qty text-right">Qty</th>
+                    <th class="col_single text-right">Single</th>
+                    <th class="col_discount text-right">Discount</th>
+                    <th class="col_total text-right">Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in items %}
+                  <!--
+                    weird error that happens in this theme when item.total() is called before itemDiscount variable
+                    total under discount will appear properly.  If you remove that itemTotal and replace with item.total()
+                    discount will disappear.
+                  -->
+                  {% set itemTotal = item.total() %}
+                  {% set itemDiscount = ((item.quantity * item.product.price) - itemTotal) %}
+
+                    <tr>
+                        <td data-title="Product" class="col_product text-left">
+                            <div class="image visible-desktop">
+                                <a href="/product/{{ item.product.url_name }}">
+                                    <img src="{{ item.product.images.first.thumbnail(60, 60)|default('http://placehold.it/80x80') }}">
+                                </a>
+                            </div>
+
+                            <h5>
+                                <a href="/product/{{ item.product.url_name }}">{{ item.product.name }}</a>
+                            </h5>
+
+                            <ul class="options">
+                            {% set description = item.optionsString() %}
+                                {% if description %}
+                                    <li>{{ description|unescape }}</li>
+                                {% endif %}
+                            </ul>
+
+                        </td>
+
+                        {%if edit_cart %}
+                            <td data-title="Remove" class="col_remove text-right">
+                                <a href="#" data-ajax-handler="shop:cart"
+                                    data-ajax-update="#cart-content=shop-cart-content, #mini-cart=shop-minicart"
+                                    data-ajax-extra-fields="delete_item='{{ item.key }}'">
+                                    <i class="icon-trash icon-large"></i>
+                                </a>
+                            </td>
+                        {% else %}
+                            <td class="col_remove text-right"></td>
+                        {% endif %}
+
+                        {%if edit_cart %}
+                            <td data-title="Qty" class="col_qty text-right">
+                                <input type="text" name="item_quantity[{{ item.key }}]" value="{{ item.quantity }}" />
+                            </td>
+                        {% else %}
+                            <td data-title="Qty" class="col_qty text-right">{{ item.quantity }}</td>
+                        {% endif %}
+
+                        <td data-title="Single" class="col_single text-right">
+                        {% if item.product.onSale %}
+                            <span style="text-decoration:line-through; font-size: 10px; color: #939694">{{ item.fullPrice|currency }}&nbsp;&nbsp;</span>
+                            <span class="single-price">{{ item.price()|currency }}</span>
+                        {% else %}
+                            <span class="single-price">{{ item.price|currency }}</span>
+                        {% endif %}
+                        </td>
+
+                        {% if item.totalDiscount() > 0 %}
+                          <td data-title="Discount" class="col_discount text-right"><span class="discount">{{ item.totalDiscount()|currency }}</span></td>
+                        {% else %}
+                          <td data-title="Discount" class="col_discount text-right">&nbsp;</td>
+                        {% endif %}
+
+                        <td data-title="Total" class="col_total text-right">
+                            <span class="total-price">{{ item.total()|currency }}</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

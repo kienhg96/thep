@@ -1,0 +1,63 @@
+{% if paymentMethod is defined %}
+    {% if paymentMethod.isLegacy() %}
+        <p>
+            This payment method type is no longer supported. Create a standard or custom method.
+        </p>
+    {% elseif paymentMethod.isStandard() %}
+        <!-- Render iFrame payment form if a standard-type payment method. -->
+        {% if hasFeature('saved-cards') %}
+            {% set saved_card_enabled = true %}
+        {% else %}
+            {% set saved_card_enabled = false %}
+        {% endif %}
+        <div class="span9">
+            {{ paymentForm({
+                    options: {
+                        number:{
+                            label: ' ',
+                            placeholder: 'Card Number',
+                            style: "font-family: Verdana; letter-spacing: 1px; font-weight: bold; font-size: 15px; color: #8d8d8d; padding: 15px 19px 15px 0px; width: 91%;"
+                        },
+                        cvv: {
+                            label: ' ',
+                            placeholder: 'CVV',
+                            style: "font-family: Verdana; letter-spacing: 1px; font-weight: bold; font-size: 15px; color: #8d8d8d; padding: 15px 19px 15px 0px; width: 91%;"
+                        },
+                        full_name: {
+                            label:' '
+                        },
+                        expiry: {
+                            label:' '
+                        },
+                        submit: {
+                            label: ' ',
+                            value: 'Pay Now'
+                        },
+                        save_card: {
+                            label: 'Save Card',
+                            enabled: saved_card_enabled
+                        }
+                    }
+                },
+                paymentMethod
+            ) }}
+        </div>
+    {% elseif paymentMethod.isAlternative() %}
+        {% set name = paymentMethod.getFrontendPartialName() %}
+        {{ partial(name, {paymentMethod: paymentMethod, payment: payment}) }}
+    {% endif %}
+{% else %}
+    <p>
+      This payment method has no payment form.
+    </p>
+    <div class="box-footer">
+        <div class="pull-left">
+            <a class="btn btn-small" href="#"
+            data-ajax-handler="shop:checkout"
+            data-ajax-update="#checkout-page=shop-checkout, #checkout-progress=shop-checkout-progress, #mini-cart=shop-minicart"
+            data-ajax-extra-fields="nextStep=review">
+            <i class="icon-chevron-left"></i> &nbsp; Order Review
+            </a>
+        </div>
+    </div>
+{% endif %}

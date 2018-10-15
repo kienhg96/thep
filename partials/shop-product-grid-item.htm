@@ -1,0 +1,27 @@
+{% set is_on_sale = product.onSale %} {% set page_url = '/product/' ~ product.url_name %}
+
+<li class="standard" data-price="{{ product.price}}">
+  <a href="{{ page_url }}" title="{{ product.images.first.title }}">
+  <div class="image">
+    <img src="{{ product.images.first.thumbnail(365, 365)|default('http://placehold.it/365x365') }}" width="365" height="365" alt="{{ product.images.first.description }}" title="{{ product.images.first.title }}"/>
+    {% if is_on_sale %}
+      <span class="badge badge-sale">SALE</span>
+    {% endif %}
+  </div>
+  <div class="title">
+    <div class="prices">
+      {% if is_on_sale %}
+        <del class="base">{{ product.fullPrice|currency }}</del>
+      {% endif %}
+      {% if product.type == 'upsell' and product.discount %}
+          <del class="base">
+              {{ product.product_relation.base_price|currency }}
+          </del>
+          <span class="price">{{ (product.product_relation.base_price - product.discount)|currency }}</span>
+      {% else %}
+          <span class="price">{{ product.product_relation.base_price|currency }}</span>
+      {% endif %}
+    </div>
+    <h3>{{ product.name }}</h3>
+  </div>
+</li>

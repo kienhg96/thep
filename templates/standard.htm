@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en" class="no-js">
+    <head>        
+        {% include "partials/layout-head.htm" %}
+    </head>
+    <body>
+        <div class="wrapper">
+        <!-- Header -->
+            {% include "partials/layout-header.htm" %}
+        <!-- End Header -->
+        
+        <!-- Navigation -->
+            {% include "partials/navigation.htm" %}
+        <!-- End class="navigation" -->
+
+        <!-- Content section -->		
+            <section class="main">
+                {% block content %}{% endblock %}
+            </section>
+        <!-- End class="main" -->
+ 
+        <!-- Footer -->
+            {% include "partials/layout-footer.htm" %}
+        <!-- End id="footer" -->            
+            
+        <!-- Credits bar -->
+            {% include "partials/credits-bar.htm" %}
+        <!-- End class="credits" -->            
+        </div>
+    </body>
+</html>

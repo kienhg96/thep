@@ -1,0 +1,269 @@
+{% set on_sale = product.onSale %}
+<!-- Product content -->
+<section class="product">
+    <!-- Product info -->
+    <section class="product-info">
+      <div class="container" itemscope itemtype="http://data-vocabulary.org/Product">
+        <div class="row">
+          <div class="span4">
+            <div class="product-images">
+              <div class="box">
+                <div class="primary">
+                  <img itemprop="image" src="{{ product.images.first.thumbnail(746, 'auto')|default('http://placehold.it/460x300') }}"
+                  data-zoom-image="{{ product.images.first.thumbnail(746, 'auto')|default('http://placehold.it/460x300') }}" alt="{{ product.images.first.title }}"/>
+                </div>
+                {% if product.images.count > 1 %}
+                  <div class="thumbs" id="gallery">
+                    <ul class="thumbs-list">
+                      {% set counter=1 %}
+                      {% for image in product.images %}
+                        <li>
+                            <a class="{{ counter == 1 ? 'active' : null }}" href="#" data-image="{{ image.thumbnail(746, 'auto') }}" title="{{ product.title }}" data-zoom-image="{{ image.thumbnail(746, 'auto') }}">
+                            <img src="{{ image.thumbnail(228, 228) }}" alt="{{ image.title }}" />
+                            </a>
+                        </li>
+                        {% set counter = counter + 1 %}
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+                {% if theme.socialToggle %}
+                  <div class="social social-links">
+                    <a href="http://www.facebook.com/sharer/sharer.php?u=http:{{ site_url('/') }}product/{{ product.url_name}}" target="_blank" class="facebook btn btn-mini share s_facebook">
+                      <i class="icon-facebook-sign"></i>
+                    </a>
+
+                    <a href="https://twitter.com/intent/tweet?text={{ product.name }} http:{{ site_url('/') }}product/{{ product.url_name}}" target="_blank" class="twitter btn btn-mini share s_twitter">
+                        <i class="icon-twitter-sign"></i>
+                    </a>
+
+                    <a href="https://plus.google.com/share?url=http:{{ site_url('/') }}product/{{ product.url_name}}" target="_blank" class="google btn btn-mini share s_plus">
+                        <i class="icon-google-plus-sign"></i>
+                    </a>
+
+                    <a href="http://pinterest.com/pin/create/button/?url=http:{{ site_url('/') }}product/{{ product.url_name}}&media={{ product.images.first.thumbnail(746, 'auto') }}" target="_blank" class="pinterest btn btn-mini share s_pinterest">
+                        <i class="icon-pinterest-sign"></i>
+                    </a>
+
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="span8">
+            <!-- Product content -->
+            <div class="product-content">
+              <div class="box">
+                <!-- Tab panels' navigation -->
+                <ul class="nav nav-tabs">
+                  <li class="active">
+                    <a href="#product" data-toggle="tab">
+                      <i class="icon-reorder icon-large"></i>
+                      <span class="hidden-phone">Product</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#description" data-toggle="tab">
+                      <i class="icon-info-sign icon-large"></i>
+                      <span class="hidden-phone">Info</span>
+                    </a>
+                  </li>
+                </ul>
+                <!-- End Tab panels' navigation -->
+                <!-- Tab panels container -->
+                <div class="tab-content">
+                  <!-- Product tab -->
+                  <div class="tab-pane active" id="product" itemprop="offerDetails" itemscope itemtype="http://data-vocabulary.org/Offer">
+                    <div class="details">
+                      {{ flash() }}
+                      <h1 itemprop="name">{{ product.name }}</h1>
+                      {% if on_sale %}
+                        <div class="prices on-sale">
+                          <span class="on-sale-price">{{ product.fullPrice|currency }}</span>
+                        </div>
+                      {% endif %}
+                      <div class="prices">
+                        <span class="price" itemprop="price">{{ product.price|currency }}</span>
+                        <meta itemprop="currency" content="USD" />
+                      </div>
+                      <div class="meta">
+                        <div class="sku">
+                          <i class="icon-pencil"></i>
+                          <span itemprop="identifier" content="sku" rel="tooltip" title="SKU is {{ product.sku }}">{{ product.sku }}</span>
+                        </div>
+                        <div class="categories">
+                          <ul class="links">
+                            {% for category in product.categories %}
+                              <span itemprop="category"><i class="icon-tags"></i><a href="/category/{{ category.fullUrlName }}" title="{{ category.name }}">{{ category.name }}</a></span>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    {% if product.short_description %}
+                      <div class="short-description">
+                        {{ product.short_description|unescape }}
+                      </div>
+                    {% endif %}
+
+
+
+                    {% if theme.ratingToggle %}
+                      <div class="product-rating-container">
+                        <!-- product ratings -->
+                        {% set product_rating = product.rating() %}
+                        <p style="display: inline;">
+                          {% if product_rating.total_reviews %}
+                            <span style="margin-right: -4px">
+                              {% for i in range(1, product_rating.average_int) %}
+                                &starf;
+                              {% endfor %}
+                            </span>
+                            {% if product_rating.average_int != 5 %}
+                              {% for i in range(1, 5 - product_rating.average_int) %}
+                                &star;
+                              {% endfor %}
+                            {% endif %}
+                            ({{ product_rating.total_reviews }})&nbsp;
+                            <!-- View Review -->
+                            <a data-toggle="modal" data-target="#viewModal" href="#">View Review(s)</a>
+                            &nbsp;&nbsp;|&nbsp;&nbsp;
+                          {% else %}
+                            &star;&star;&star;&star;&star;
+                            (no reviews yet)
+                          {% endif %}
+                          <!-- Write Review -->
+                          <a data-toggle="modal" data-target="#writeModal" href="#">Write Review</a>
+                        </p>
+
+                        {{ partial('shop-product-review-view') }}
+                      </div>
+                    {% endif %}
+
+                    {{ partial('shop-product-options') }}
+                    {{ partial('shop-product-extras') }}
+                    <hr />
+                    <div class="row-fluid">
+                      {% if product.priceTiers.count or product.productAttributes.count %}
+                        <div class="span6">
+                            {{ partial('shop-product-pricingTiers') }}
+                        </div>
+                      {% endif %}
+                      <div class="{% if product.priceTiers %} span6 {% else %} span12 {% endif %}">
+                          {{ partial('shop-product-attributes') }}
+                      </div>
+                    </div>
+
+                    {% if product.enabled %}
+                      {% if not product.isOutOfStock() or product.allow_preorder %}
+
+                        <div class="add-to-cart">
+                          <div class="quantity inline">
+                  					<h5>Quantity</h5>
+                  					<input class="md-input quantity" type="text" value="{{ quantity|default("1") }}" name="quantity"/>
+                  				</div>
+
+                          <input type="hidden" name="productId" value="{{ product.id }}"/>
+                          <button class="btn btn-primary btn-large" href="#" id="add_to_cart">
+                          <i class="icon-plus"></i> &nbsp; Add to cart</button>
+                          <div class="stock-level">{{ product.in_stock_amount }} available</div>
+                        </div>
+                      {% else %}
+                        <div class="not-available">
+                          <p>
+                            This product is temporarily unavailable.
+                            {% if product.om('expected_availability_date', posted_options) %}
+                            <br/>The expected availability date is <strong>{{ product.om('expected_availability_date', posted_options).format('%x') }}</strong>
+                            {% endif %}
+                          </p>
+                        </div>
+                      {% endif %}
+                    {% else %}
+                      <div class="not-available"><p>This product is not available.</p></div>
+                    {% endif %}
+                  </div>
+                  <!-- End id="product" -->
+
+                  <!-- Description tab -->
+                  <div class="tab-pane" id="description" itemprop="description">
+                    {{ product.description|unescape }}
+                  </div>
+                  <!-- End id="description" -->
+                </div>
+                <!-- End tab panels container -->
+              </div>
+            </div>
+            <!-- End class="product-content" -->
+          </div>
+        </div>
+
+        {% if product.crosssells.isEmpty() == false and theme.crossSellToggle == true %}
+          <div class="row">
+            <div class="span12">
+              <h3>Related items</h3>
+              <ul class="product-list isotope">
+                {% for product in product.crosssells %}
+                  {{ partial('shop-product-grid-item', {'product':product}) }}
+                {% endfor %}
+                {% for product in product.upsells %}
+                  {{ partial('shop-product-grid-item', {'product':product}) }}
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+    <!-- End class="product-info" -->
+    {% if theme.fbCommentsAppIDText > 0 %} <!-- if Facebook App ID is entered, display comments -->
+    <!-- Product Reviews -->
+    <section class="product-reviews">
+        <div class="container">
+            <div class="span8 offset2">
+                <h5>Tell us why you <span class="script">love&#10084;</span> this product</h5>
+
+                <!-- Facebook comments -->
+                <div id="fb-root"></div>
+                <script>
+                    (function(d, s, id) {
+                        var js, fjs = d.getElementsByTagName(s)[0];
+                        if (d.getElementById(id))
+                            return;
+                        js = d.createElement(s);
+                        js.id = id;
+                        js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1&appId={{ theme.fbCommentsAppIDText }}"; // uses App ID specified in custom options.
+                        fjs.parentNode.insertBefore(js, fjs);
+                    }(document, 'script', 'facebook-jssdk'));
+                </script>
+
+                <div class="fb-comments" data-width="730" data-href="https:{{ site_url('/') }}product/{{ product.url_name}}" data-num-posts="10"></div>
+                <!-- For comments to work properly, you first need to create an app in facebook, then add a platform for website and then enter your store's site URL. Then paste App ID into theme custom option. -->
+
+                <!-- End Facebook comments -->
+
+            </div>
+        </div>
+    </section>
+    <!-- End class="product-reviews" -->
+    {% endif %}
+    <!-- Added to cart modal window -->
+    <div id="added" class="modal hide fade" tabindex="-1">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <div class="hgroup title">
+                <h3>You're one step closer to owning this product!</h3>
+                <h5>"{{ product.name }}" has been added to your cart</h5>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="pull-right">
+                <a href="/cart" class="btn btn-primary btn-small">
+                Go to cart &nbsp; <i class="icon-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- End id="added" -->
+</section>
+<!-- End class="product-info" -->

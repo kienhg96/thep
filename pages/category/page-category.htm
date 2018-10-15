@@ -1,0 +1,17 @@
+<section class="category">
+    <div class="container">
+        <div class="row">
+            {% if not category %}
+            <div class="span12 text-center">
+                <h2>Category not found</h2>
+                <p>We are sorry, the requested category was not found.</p>
+            </div>
+            {% else %}
+            <div class="span3">
+                {% include "partials/category-sidebar.htm" %}
+            </div>
+                {% include "partials/shop-product-list.htm" %}
+            {% endif %}
+        </div>
+    </div>
+</section>
